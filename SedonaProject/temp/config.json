@@ -1,0 +1,6 @@
+{
+    "joinDistance": 1000,
+    "partitioner": "UNIVERSAL_QUADTREE_ONETHEFLY",
+    "inputLocation1": "/world_crs_10M/bank_world.csv",
+    "inputLocation2": "/world_crs_10M/hotels_world.csv"
+}

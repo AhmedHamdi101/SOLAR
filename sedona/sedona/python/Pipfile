@@ -1,0 +1,26 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest="*"
+notebook="==6.4.12"
+jupyter="*"
+mkdocs="*"
+pytest-cov = "*"
+
+[packages]
+pandas="<=1.5.3"
+numpy="<2"
+geopandas="*"
+shapely=">=1.7.0"
+pyspark=">=2.3.0"
+attrs="*"
+pyarrow="*"
+keplergl = "==0.3.2"
+pydeck = "===0.8.0"
+rasterio = ">=1.2.10"
+
+[requires]
+python_version = "3.7"

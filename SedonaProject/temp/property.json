@@ -1,0 +1,4 @@
+{
+    "location1": "hdfs://mr-hn:8020/user/yliu786/world_crs_test/hotels_world.csv",
+    "location2": "hdfs://mr-hn:8020/user/yliu786/world_crs_test/hotels_world.csv"
+}
