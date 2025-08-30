@@ -126,8 +126,9 @@ def compute_jsd_distance(hist1, hist2):
 
 def compute_histogram(hdfs_dir, div):
     dir_path = f"stat/histogram/{div}/"
-    filename = f"{dir_path}{hdfs_dir.replace('/', '@')}.pkl"
-    
+#    filename = f"{dir_path}{hdfs_dir.replace('/', '@')}.pkl"
+    filename = f"{dir_path}{hdfs_dir.split('datasets/')[-1].replace('/', '@')}.pkl"
+   
     if os.path.exists(filename):
         #print(f"Histogram already exists: {filename}")
         return
@@ -150,8 +151,8 @@ def compute_histogram(hdfs_dir, div):
 
 def compute_polygon_feature(hdfs_dir):
     dir_path = "stat/polygon_feature/"
-    filename = f"{dir_path}{hdfs_dir.replace('/', '@')}.pkl"
-
+  #  filename = f"{dir_path}{hdfs_dir.replace('/', '@')}.pkl"
+    filename = f"{dir_path}{hdfs_dir.split('datasets/')[-1].replace('/', '@')}.pkl"
     if os.path.exists(filename):
         print(f"Polygon feature already exists: {filename}")
         return
@@ -197,7 +198,7 @@ def compute_all_polygon_features(datasets):
 
 
 def read_polygon_feature(hdfs_dir):
-    filename = f"stat/polygon_feature/{hdfs_dir.replace('/', '@')}.pkl"
+    filename = f"stat/polygon_feature/{hdfs_dir.split('datasets/')[-1].replace('/', '@')}.pkl"
     with open(filename, 'rb') as f:
         features = pickle.load(f)
     return features

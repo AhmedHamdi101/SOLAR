@@ -11,6 +11,8 @@ import random
 from collections import defaultdict
 from itertools import combinations
 import math
+import torch
+import json
 
 class Optimizer():
     def __init__(self, seed):
@@ -193,14 +195,53 @@ class Optimizer():
             #    print("    ---- the diff between two dataset (for debugging) is ", np.sum(dataset1_encoding - dataset2_encoding))
             #    print("    ------------------")
 
-
+        
         start = time.time()
         self.trainer = neuralnet.SiameseModelTrainerFusion()
         self.model = self.trainer.train_model(encodings_and_diff)
         end = time.time()
+        os.makedirs("./learning_py/trainer_meta_data", exist_ok=True)
+        self.save_model("./learning_py/trainer_meta_data")
         print("---- training takes time ", (end - start), " current div is ",div)
+        
+        
     
+    def save_model(self, path: str):
     
+
+        model_path = os.path.join(path, "decider.pt")
+        torch.save(self.model.state_dict(), model_path)
+        print(f"[Optimizer] Saved model weights to {model_path}")
+
+        # save both structures directly with pickle
+        repo_path = os.path.join(path, "encodings_and_map.pkl")
+        with open(repo_path, "wb") as f:
+            pickle.dump({
+                "dataset_encoding_repos": self.dataset_encoding_repos,
+                "encoding_path_mappings": self.encoding_path_mappings,
+                }, f)
+        print(f"[Optimizer] Saved encodings + mappings to {repo_path}")
+
+
+
+    def load_model(self, path: str):
+        
+        model_path = os.path.join(path, "decider.pt")
+        self.model = neuralnet.SiameseNetworkFusion()
+        self.model.load_state_dict(torch.load(model_path, map_location="cpu"))
+        self.model.eval()
+
+        self.trainer = neuralnet.SiameseModelTrainerFusion()
+        self.trainer.model = self.model
+
+        repo_path = os.path.join(path, "encodings_and_map.pkl")
+        with open(repo_path, "rb") as f:
+            data = pickle.load(f)
+        self.dataset_encoding_repos = data["dataset_encoding_repos"]
+        self.encoding_path_mappings = data["encoding_path_mappings"]
+
+        print(f"[Optimizer] Loaded model + encodings/mappings from {repo_path}")
+
     
     # ["GEOSPARK_QUADTREE", "GEOSPARK_KDBTREE", "GEOSPARK_GRID"]
     def evaluate_model(self, joins, dist, baselines, selector, debug, experiment_mode = False):
@@ -305,6 +346,7 @@ class Optimizer():
             matched_encoding_key = self.dataset_encoding_repos[index1].tobytes() if pred_dist1 < pred_dist2 else self.dataset_encoding_repos[index2].tobytes()
           
             matched_partitioner_dataset_name = self.encoding_path_mappings[matched_encoding_key]
+            matched_partitioner_dataset_name = matched_partitioner_dataset_name.split("datasets/")[-1]
             matched_partitioner_path = f"stat/partitioner/{matched_partitioner_dataset_name.replace('/', '@')}"
             
             join_para = {"joinDistance" : dist, "partitioner": "UNIVERSAL_QUADTREE_PRECOMPUTED", "matchedPartitioner": matched_partitioner_path}

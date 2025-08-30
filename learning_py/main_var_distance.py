@@ -21,8 +21,10 @@ def split_datasets_and_generate_joins(datasets, debug, seed, percentage):
 
 
     join_seen = []
-    remaining_seen = set(datasets_seen)
-
+    
+    remaining_seen = list(datasets_seen)
+    random.shuffle(remaining_seen)
+    
     while remaining_seen:
         left = remaining_seen.pop()
         right = random.choice([d for d in datasets_seen if d != left])
@@ -53,20 +55,27 @@ def split_datasets_and_generate_joins(datasets, debug, seed, percentage):
         for jn in join_unseen:
             print("        ----", jn)
     #exit(0)
+    #print(join_seen)
     return datasets_seen, datasets_unseen, join_seen, join_unseen
 
 
 
-def run_scenario(dataset_dirs, distances, grid, selector, percentage, debug, experiment_mode, seed=2024):
+def run_scenario(dataset_dirs, distances, grid, selector, skip_training, percentage, debug, experiment_mode, seed=2024):
     join_optimizer = Optimizer(seed)
     datasets = []
     for ddir in dataset_dirs:
         datasets += util.get_dataset_paths(ddir)
     
+    
     datasets_seen, datasets_unseen, joins_seen, joins_unseen = split_datasets_and_generate_joins(datasets, debug,  seed, percentage)
-    join_optimizer.offline_partitioning(joins_seen, distances[1], [grid], debug)
+    #join_optimizer.offline_partitioning(joins_seen, distances[0], [grid], debug)
+
     util.compute_all_polygon_features(datasets)
-    join_optimizer.training(datasets_seen, grid, debug)
+    
+    if not skip_training:
+        join_optimizer.training(datasets_seen, grid, debug)
+    else:
+        join_optimizer.load_model("./learning_py/trainer_meta_data")
 
     for distance in distances:
         print("the current distance is ", distance)
@@ -81,12 +90,19 @@ if __name__ == "__main__":
     debug = True
     experiment_mode = False
     seed = 2025316
-    distances = [200,400,600,800]
+    distances = [400]
     percentage = 0.8
 
+    skip_training = True
     selector = MethodSelector()
-    selector.load_model("new_pycode/my_method_selector.pkl")
+    selector.load_model("./learning_py/my_method_selector.pkl")
+    
 
+      
 
+    run_scenario(["/user/aabde039/datasets/dataset_china",
+                  "/user/aabde039/datasets/dataset_us",
+                  "/user/aabde039/datasets/dataset_world",
+                  "/user/aabde039/datasets/dataset_other"], distances,  default_grid, selector, skip_training, percentage, debug, experiment_mode, seed)
 
-    run_scenario(["/dataset_china","/dataset_us","/dataset_world","/dataset_other"], distances,  default_grid, selector, percentage, debug, experiment_mode, seed)
+    #run_scenario(["/dataset_china","/dataset_us","/dataset_world","/dataset_other"], distances,  default_grid, selector, percentage, debug, experiment_mode, seed)

@@ -90,9 +90,12 @@ public class SedonaApp {
 			if (!directory.exists()) {
 				directory.mkdirs(); // This will create the directory if it doesn't exist
 			}
+                        
+                        String fixed_inputLocation1 = inputLocation1.substring(inputLocation1.indexOf("datasets/") + "datasets/".length());
+			String filePath = directoryPath + fixed_inputLocation1.replace("/", "@");
 
-			String filePath = directoryPath + inputLocation1.substring(97).replace("/", "@");
-			
+                        //String filePath = directoryPath + inputLocation1.substring(41).replace("/", "@");
+			System.err.println(filePath);
 			if (ret instanceof StandardQuadTree) {
 				StandardQuadTree.serializeQuadTree((StandardQuadTree) ret, filePath);
 			} else {
@@ -105,6 +108,9 @@ public class SedonaApp {
 		else if(partitionerType.equals("UNIVERSAL_QUADTREE_PRECOMPUTED")) // run join using a precomputed quadtree partitioner
 		{
 			String matchedPartitioner = obj.getString("matchedPartitioner");
+                        //matchedPartitioner = "stat/partitioner" + matchedPartitioner.substring(inputLocation1.indexOf("datasets@") + "datasets@".length());
+                        //System.err.println("Hello World!");
+                        //System.err.println(matchedPartitioner);
 
 			StandardQuadTree t = StandardQuadTree.deserializeQuadTree(matchedPartitioner);  // No partitioner required here
 			PointRDD S = new PointRDD(sc, inputLocation1,0, FileDataSplitter.CSV, true, false);
