@@ -154,8 +154,8 @@ class Optimizer():
         for pair in dataset_pairs:
             dataset1, dataset2 = pair
 
-            hist1_path = f"stat/histogram/{div}/{dataset1.replace('/', '@')}.pkl"
-            hist2_path = f"stat/histogram/{div}/{dataset2.replace('/', '@')}.pkl"
+            hist1_path = f"stat/histogram/{div}/{dataset1.split('datasets/')[-1].replace('/', '@')}.pkl"
+            hist2_path = f"stat/histogram/{div}/{dataset2.split('datasets/')[-1].replace('/', '@')}.pkl"
 
             with open(hist1_path, 'rb') as f1:
                 hist1 = pickle.load(f1)
